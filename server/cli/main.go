@@ -6,15 +6,24 @@ import (
 	"strings"
 )
 
-func main() {
-	key := apiKeyFromEnv()
-	ok := strings.HasPrefix(key, "gram")
+var API_KEY string = apiKeyFromEnv()
 
-	fmt.Printf("API key looks good: %v", ok)
+func main() {
+	fmt.Printf("Starting CLI.")
 }
 
 func apiKeyFromEnv() string {
-	return mustEnv("GRAM_API_KEY")
+	return validateApiKey(mustEnv("GRAM_API_KEY"))
+}
+
+func validateApiKey(key string) string {
+	ok := strings.HasPrefix(key, "gram")
+
+	if ok {
+		return key
+	} else {
+		panic(fmt.Errorf("key is malformed"))
+	}
 }
 
 func mustEnv(key string) string {
