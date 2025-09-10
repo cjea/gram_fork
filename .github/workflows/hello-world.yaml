@@ -1,0 +1,35 @@
+name: Hello World
+
+on:
+  push:
+    branches:
+      - main
+      - cli
+  pull_request:
+    branches:
+      - main
+      - cli
+
+jobs:
+  hello:
+    name: Hello World
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Say Hello
+        run: |
+          echo "Hello World! 🎉"
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Event: ${{ github.event_name }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Commit SHA: ${{ github.sha }}"
+
+      - name: Show environment info
+        run: |
+          echo "OS: $(uname -a)"
+          echo "Working directory: $(pwd)"
+          echo "Files in repo:"
+          ls -la
