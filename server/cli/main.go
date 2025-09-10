@@ -14,6 +14,7 @@ import (
 )
 
 var API_KEY string = apiKeyFromEnv()
+var PROJECT_SLUG string = "cj"
 
 func main() {
 	fmt.Printf("Starting CLI.")
@@ -37,7 +38,10 @@ func main() {
 	)
 
 	ctx := context.Background()
-	payload := &deployments.ListDeploymentsPayload{ApikeyToken: &API_KEY}
+	payload := &deployments.ListDeploymentsPayload{
+		ApikeyToken:      &API_KEY,
+		ProjectSlugInput: &PROJECT_SLUG,
+	}
 
 	result, err := client.ListDeployments(ctx, payload)
 	if err != nil {
