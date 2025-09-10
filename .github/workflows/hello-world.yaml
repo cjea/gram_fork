@@ -19,7 +19,14 @@ jobs:
         with:
           go-version: "1.23"
 
+      - name: "[Simulate] Install CLI"
+        run: |
+          cd server
+          go build -o gram_cli ./cli/main.go
+          stat gram_cli
+          ls -lh gram_cli
+
       - name: Run CLI
-        run: cd server && go run ./cli/main.go
         env:
           GRAM_API_KEY: ${{ secrets.GRAM_API_KEY }}
+        run: cd server && ./gram_cli
