@@ -1,10 +1,6 @@
 name: CLI Test
 
 on:
-  push:
-    branches:
-      - main
-      - cli
   pull_request:
     branches:
       - main
