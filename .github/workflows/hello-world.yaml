@@ -20,6 +20,6 @@ jobs:
           go-version: "1.23"
 
       - name: Run CLI
-        run: go run server/cli/main.go
+        run: cd server && go run ./cli/main.go
         env:
           GRAM_API_KEY: ${{ secrets.GRAM_API_KEY }}
