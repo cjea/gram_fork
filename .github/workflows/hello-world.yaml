@@ -23,10 +23,12 @@ jobs:
         run: |
           cd server
           go build -o gram_cli ./cli/main.go
-          stat gram_cli
           ls -lh gram_cli
 
       - name: Run CLI
         env:
           GRAM_API_KEY: ${{ secrets.GRAM_API_KEY }}
+          GRAM_SCHEME: https
+          GRAM_HOST: ${{ vars.GRAM_HOST }}
+          GRAM_PROJECT_SLUG: ${{ vars.GRAM_PROJECT_SLUG }}
         run: cd server && ./gram_cli

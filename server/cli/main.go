@@ -14,44 +14,61 @@ import (
 )
 
 var API_KEY string = apiKeyFromEnv()
-var PROJECT_SLUG string = "cj"
+var PROJECT_SLUG string = mustEnv("GRAM_PROJECT_SLUG")
 
 func main() {
-	fmt.Printf("Starting CLI.")
-	scheme := "https"
-	host := "app.getgram.ai"
+	fmt.Printf("Starting CLI.\n")
 
-	doer := &http.Client{}
-	enc := goahttp.RequestEncoder
-	dec := goahttp.ResponseDecoder
-	restoreBody := false
+	httpClient := httpClientForGoa()
+	deploymentClient := newDeploymentClient(httpClient)
 
-	httpClient := httpclient.NewClient(scheme, host, doer, enc, dec, restoreBody)
-	client := deployments.NewClient(
-		httpClient.GetDeployment(),
-		httpClient.GetLatestDeployment(),
-		httpClient.CreateDeployment(),
-		httpClient.Evolve(),
-		httpClient.Redeploy(),
-		httpClient.ListDeployments(),
-		httpClient.GetDeploymentLogs(),
-	)
+	result := listDeployments(deploymentClient)
+	printDeployments(result)
+}
 
+func printDeployments(ds *deployments.ListDeploymentResult) {
+	for i, deployment := range ds.Items {
+		fmt.Printf("  [%d] %+v\n", i+1, deployment)
+	}
+}
+
+func listDeployments(d *deployments.Client) *deployments.ListDeploymentResult {
 	ctx := context.Background()
 	payload := &deployments.ListDeploymentsPayload{
 		ApikeyToken:      &API_KEY,
 		ProjectSlugInput: &PROJECT_SLUG,
 	}
 
-	result, err := client.ListDeployments(ctx, payload)
+	result, err := d.ListDeployments(ctx, payload)
 	if err != nil {
 		log.Fatalf("Error calling ListDeployments: %v", err)
 	}
 
-	fmt.Printf("Success! Got %d deployments\n", len(result.Items))
-	for i, deployment := range result.Items {
-		fmt.Printf("  [%d] %+v\n", i+1, deployment)
-	}
+	return result
+}
+
+func newDeploymentClient(h *httpclient.Client) *deployments.Client {
+	return deployments.NewClient(
+		h.GetDeployment(),
+		h.GetLatestDeployment(),
+		h.CreateDeployment(),
+		h.Evolve(),
+		h.Redeploy(),
+		h.ListDeployments(),
+		h.GetDeploymentLogs(),
+	)
+
+}
+
+func httpClientForGoa() *httpclient.Client {
+	scheme := envOr("GRAM_SCHEME", "https")
+	host := mustEnv("GRAM_HOST")
+	doer := &http.Client{}
+	enc := goahttp.RequestEncoder
+	dec := goahttp.ResponseDecoder
+	restoreBody := false
+
+	return httpclient.NewClient(scheme, host, doer, enc, dec, restoreBody)
 }
 
 func apiKeyFromEnv() string {
@@ -75,4 +92,13 @@ func mustEnv(key string) string {
 	}
 
 	return val
+}
+
+func envOr(key string, fallback string) string {
+	val := os.Getenv(key)
+	if len(val) == 0 {
+		return fallback
+	} else {
+		return val
+	}
 }
