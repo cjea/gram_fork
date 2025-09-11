@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,11 +12,19 @@ import (
 
 	"github.com/speakeasy-api/gram/server/gen/deployments"
 	depl_client "github.com/speakeasy-api/gram/server/gen/http/deployments/client"
+	"github.com/urfave/cli/v2"
 	goahttp "goa.design/goa/v3/http"
 )
 
-var API_KEY string = apiKeyFromEnv()
-var PROJECT_SLUG string = mustEnv("GRAM_PROJECT_SLUG")
+type Source struct {
+	Type string `json:"type"`
+	Loc  string `json:"loc"`
+}
+
+type CliRequest struct {
+	Project string   `json:"project"`
+	Sources []Source `json:"sources"`
+}
 
 var goaDoer = &http.Client{
 	Timeout: 30 * time.Second,
@@ -26,13 +35,65 @@ var goaDoer = &http.Client{
 	},
 }
 
+var fileFlagName = "file"
+var fileFlag = &cli.StringFlag{
+	Name:     fileFlagName,
+	Aliases:  []string{"f"},
+	Usage:    "Path to the project configuration file",
+	Value:    "server/cli/test.json",
+	Required: false,
+}
+
 func main() {
+	app := &cli.App{
+		Name:   "gram_cli",
+		Usage:  "Gram CLI tool",
+		Flags:  []cli.Flag{fileFlag},
+		Action: mainAction,
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func mainAction(c *cli.Context) error {
 	fmt.Printf("Starting CLI.\n")
+
+	filePath := c.String(fileFlagName)
+	project, err := readProjectConfig(filePath)
+	if err != nil {
+		return fmt.Errorf("error reading project config: %w", err)
+	}
+
+	fmt.Printf("Loaded project: %s\n", project.Project)
+	fmt.Printf("Sources: %+v\n", project.Sources)
+
+	apiKey := apiKeyFromEnv()
+	projectSlug := mustEnv("GRAM_PROJECT_SLUG")
 
 	deploymentClient := newDeploymentClient()
 
-	result := listDeployments(deploymentClient)
+	result := listDeployments(deploymentClient, apiKey, projectSlug)
 	printDeployments(result)
+
+	return nil
+}
+
+func readProjectConfig(filePath string) (*CliRequest, error) {
+	// #nosec G304 -- file path is controlled by CLI flag, not user input
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file %s: %w", filePath, err)
+	}
+
+	var project CliRequest
+	if err := json.Unmarshal(data, &project); err != nil {
+		return nil, fmt.Errorf("failed to parse JSON: %w", err)
+	}
+
+	return &project, nil
 }
 
 func printDeployments(ds *deployments.ListDeploymentResult) {
@@ -41,11 +102,13 @@ func printDeployments(ds *deployments.ListDeploymentResult) {
 	}
 }
 
-func listDeployments(d *deployments.Client) *deployments.ListDeploymentResult {
+func listDeployments(d *deployments.Client, apiKey, projectSlug string) *deployments.ListDeploymentResult {
 	ctx := context.Background()
 	payload := &deployments.ListDeploymentsPayload{
-		ApikeyToken:      &API_KEY,
-		ProjectSlugInput: &PROJECT_SLUG,
+		ApikeyToken:      &apiKey,
+		SessionToken:     nil,
+		ProjectSlugInput: &projectSlug,
+		Cursor:           nil,
 	}
 
 	result, err := d.ListDeployments(ctx, payload)

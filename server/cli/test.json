@@ -1,0 +1,9 @@
+{
+    "project": "cj",
+    "sources": [
+        {
+            "type": "openapiv3",
+            "loc": "./petstore.yaml"
+        }
+    ]
+}

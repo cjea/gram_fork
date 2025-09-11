@@ -31,4 +31,4 @@ jobs:
           GRAM_SCHEME: https
           GRAM_HOST: ${{ vars.GRAM_HOST }}
           GRAM_PROJECT_SLUG: ${{ vars.GRAM_PROJECT_SLUG }}
-        run: cd server && ./gram_cli
+        run: cd server && ./gram_cli -f ./cli/test.json
