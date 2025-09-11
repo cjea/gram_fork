@@ -7,20 +7,29 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/speakeasy-api/gram/server/gen/deployments"
-	httpclient "github.com/speakeasy-api/gram/server/gen/http/deployments/client"
+	depl_client "github.com/speakeasy-api/gram/server/gen/http/deployments/client"
 	goahttp "goa.design/goa/v3/http"
 )
 
 var API_KEY string = apiKeyFromEnv()
 var PROJECT_SLUG string = mustEnv("GRAM_PROJECT_SLUG")
 
+var goaDoer = &http.Client{
+	Timeout: 30 * time.Second,
+	Transport: &http.Transport{
+		MaxIdleConns:        100,
+		IdleConnTimeout:     90 * time.Second,
+		TLSHandshakeTimeout: 10 * time.Second,
+	},
+}
+
 func main() {
 	fmt.Printf("Starting CLI.\n")
 
-	httpClient := httpClientForGoa()
-	deploymentClient := newDeploymentClient(httpClient)
+	deploymentClient := newDeploymentClient()
 
 	result := listDeployments(deploymentClient)
 	printDeployments(result)
@@ -47,7 +56,8 @@ func listDeployments(d *deployments.Client) *deployments.ListDeploymentResult {
 	return result
 }
 
-func newDeploymentClient(h *httpclient.Client) *deployments.Client {
+func newDeploymentClient() *deployments.Client {
+	h := httpClientForGoa()
 	return deployments.NewClient(
 		h.GetDeployment(),
 		h.GetLatestDeployment(),
@@ -60,15 +70,14 @@ func newDeploymentClient(h *httpclient.Client) *deployments.Client {
 
 }
 
-func httpClientForGoa() *httpclient.Client {
+func httpClientForGoa() *depl_client.Client {
 	scheme := envOr("GRAM_SCHEME", "https")
 	host := mustEnv("GRAM_HOST")
-	doer := &http.Client{}
 	enc := goahttp.RequestEncoder
 	dec := goahttp.ResponseDecoder
 	restoreBody := false
 
-	return httpclient.NewClient(scheme, host, doer, enc, dec, restoreBody)
+	return depl_client.NewClient(scheme, host, goaDoer, enc, dec, restoreBody)
 }
 
 func apiKeyFromEnv() string {
