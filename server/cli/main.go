@@ -40,8 +40,7 @@ var fileFlag = &cli.StringFlag{
 	Name:     fileFlagName,
 	Aliases:  []string{"f"},
 	Usage:    "Path to the project configuration file",
-	Value:    "server/cli/test.json",
-	Required: false,
+	Required: true,
 }
 
 func main() {
