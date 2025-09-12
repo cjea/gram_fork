@@ -3,7 +3,26 @@ package env
 import (
 	"fmt"
 	"os"
+	"strings"
 )
+
+// EnvVarGramAPIKey is the environment variable name which points to the user's
+// API key.
+const EnvVarGramAPIKey = "GRAM_API_KEY"
+
+func ReadApiKey() string {
+	return validateApiKey(Must(EnvVarGramAPIKey))
+}
+
+func validateApiKey(key string) string {
+	ok := strings.HasPrefix(key, "gram")
+
+	if ok {
+		return key
+	} else {
+		panic(fmt.Errorf("key is malformed"))
+	}
+}
 
 func Must(key string) string {
 	val := os.Getenv(key)

@@ -2,9 +2,7 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"strings"
 
 	"github.com/speakeasy-api/gram/server/cmd/cli/env"
 	"github.com/speakeasy-api/gram/server/gen/deployments"
@@ -62,18 +60,4 @@ func deploymentService() *depl_client.Client {
 	restoreBody := false
 
 	return depl_client.NewClient(scheme, host, doer, enc, dec, restoreBody)
-}
-
-func ApiKeyFromEnv() string {
-	return validateApiKey(env.Must("GRAM_API_KEY"))
-}
-
-func validateApiKey(key string) string {
-	ok := strings.HasPrefix(key, "gram")
-
-	if ok {
-		return key
-	} else {
-		panic(fmt.Errorf("key is malformed"))
-	}
 }

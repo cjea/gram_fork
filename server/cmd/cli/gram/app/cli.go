@@ -5,7 +5,7 @@ import (
 
 	"github.com/speakeasy-api/gram/server/cmd/cli/env"
 	"github.com/speakeasy-api/gram/server/cmd/cli/gram/api"
-	"github.com/speakeasy-api/gram/server/cmd/cli/gram/depconfig"
+	"github.com/speakeasy-api/gram/server/cmd/cli/gram/deplconfig"
 	"github.com/speakeasy-api/gram/server/gen/assets"
 	"github.com/speakeasy-api/gram/server/gen/deployments"
 	"github.com/urfave/cli/v2"
@@ -45,15 +45,15 @@ func mainAction(c *cli.Context) error {
 	fmt.Printf("Starting CLI.\n")
 
 	filePath := c.String("file")
-	project, err := depconfig.ReadDeploymentConfig(filePath)
+	deplconfig, err := deplconfig.ReadDeploymentConfig(filePath)
 	if err != nil {
 		return fmt.Errorf("error reading project config: %w", err)
 	}
 
-	fmt.Printf("Loaded project: %s\n", project.Project)
-	fmt.Printf("Sources: %+v\n", project.Sources)
+	fmt.Printf("Loaded project: %s\n", deplconfig.Project)
+	fmt.Printf("Sources: %+v\n", deplconfig.Sources)
 
-	apiKey := api.ApiKeyFromEnv()
+	apiKey := env.ReadApiKey()
 	projectSlug := env.Must("GRAM_PROJECT_SLUG")
 
 	deplclient := api.NewDeploymentsClient()
