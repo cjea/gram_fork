@@ -6,6 +6,7 @@ import (
 	"github.com/speakeasy-api/gram/server/cmd/cli/env"
 	"github.com/speakeasy-api/gram/server/cmd/cli/gram/api"
 	"github.com/speakeasy-api/gram/server/cmd/cli/gram/depconfig"
+	"github.com/speakeasy-api/gram/server/gen/assets"
 	"github.com/speakeasy-api/gram/server/gen/deployments"
 	"github.com/urfave/cli/v2"
 )
@@ -55,9 +56,13 @@ func mainAction(c *cli.Context) error {
 	apiKey := api.ApiKeyFromEnv()
 	projectSlug := env.Must("GRAM_PROJECT_SLUG")
 
-	client := api.NewClient()
-	result := client.ListDeployments(apiKey, projectSlug)
+	deplclient := api.NewDeploymentsClient()
+	result := deplclient.ListDeployments(apiKey, projectSlug)
 	printDeployments(result)
+
+	assetsClient := api.NewAssetsClient()
+	assets := assetsClient.ListAssets(apiKey, projectSlug)
+	printAssets(assets)
 
 	return nil
 }
@@ -65,5 +70,11 @@ func mainAction(c *cli.Context) error {
 func printDeployments(ds *deployments.ListDeploymentResult) {
 	for i, deployment := range ds.Items {
 		fmt.Printf("  [%d] %+v\n", i+1, deployment)
+	}
+}
+
+func printAssets(as *assets.ListAssetsResult) {
+	for i, asset := range as.Assets {
+		fmt.Printf("  [%d] %+v\n", i+1, asset)
 	}
 }

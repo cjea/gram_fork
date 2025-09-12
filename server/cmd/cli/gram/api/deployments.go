@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"strings"
-	"time"
 
 	"github.com/speakeasy-api/gram/server/cmd/cli/env"
 	"github.com/speakeasy-api/gram/server/gen/deployments"
@@ -14,35 +12,26 @@ import (
 	goahttp "goa.design/goa/v3/http"
 )
 
-var goaDoer = &http.Client{
-	Timeout: 30 * time.Second,
-	Transport: &http.Transport{
-		MaxIdleConns:        100,
-		IdleConnTimeout:     90 * time.Second,
-		TLSHandshakeTimeout: 10 * time.Second,
-	},
+type DeploymentsClient struct {
+	client *deployments.Client
 }
 
-type Client struct {
-	deploymentClient *deployments.Client
-}
-
-func NewClient() *Client {
-	return &Client{
-		deploymentClient: newDeploymentClient(),
+func NewDeploymentsClient() *DeploymentsClient {
+	return &DeploymentsClient{
+		client: newDeploymentClient(),
 	}
 }
 
-func (c *Client) ListDeployments(apiKey, projectSlug string) *deployments.ListDeploymentResult {
+func (c *DeploymentsClient) ListDeployments(apiKey, projectSlug string) *deployments.ListDeploymentResult {
 	ctx := context.Background()
 	payload := &deployments.ListDeploymentsPayload{
 		ApikeyToken:      &apiKey,
-		SessionToken:     nil,
 		ProjectSlugInput: &projectSlug,
+		SessionToken:     nil,
 		Cursor:           nil,
 	}
 
-	result, err := c.deploymentClient.ListDeployments(ctx, payload)
+	result, err := c.client.ListDeployments(ctx, payload)
 	if err != nil {
 		log.Fatalf("Error calling ListDeployments: %v", err)
 	}
@@ -51,7 +40,7 @@ func (c *Client) ListDeployments(apiKey, projectSlug string) *deployments.ListDe
 }
 
 func newDeploymentClient() *deployments.Client {
-	h := httpClientForGoa()
+	h := deploymentService()
 	return deployments.NewClient(
 		h.GetDeployment(),
 		h.GetLatestDeployment(),
@@ -63,14 +52,16 @@ func newDeploymentClient() *deployments.Client {
 	)
 }
 
-func httpClientForGoa() *depl_client.Client {
+func deploymentService() *depl_client.Client {
+	doer := goaSharedHTTPClient
+
 	scheme := env.Fallback("GRAM_SCHEME", "https")
 	host := env.Must("GRAM_HOST")
 	enc := goahttp.RequestEncoder
 	dec := goahttp.ResponseDecoder
 	restoreBody := false
 
-	return depl_client.NewClient(scheme, host, goaDoer, enc, dec, restoreBody)
+	return depl_client.NewClient(scheme, host, doer, enc, dec, restoreBody)
 }
 
 func ApiKeyFromEnv() string {
