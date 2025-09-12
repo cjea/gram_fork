@@ -22,7 +22,7 @@ jobs:
       - name: "[Simulate] Install CLI"
         run: |
           cd server
-          go build -o gram_cli ./cmd/cli/main.go
+          go build -o gram_cli ./cmd/cli/gram/main.go
           ls -lh gram_cli
 
       - name: Run CLI
@@ -31,4 +31,4 @@ jobs:
           GRAM_SCHEME: https
           GRAM_HOST: ${{ vars.GRAM_HOST }}
           GRAM_PROJECT_SLUG: ${{ vars.GRAM_PROJECT_SLUG }}
-        run: cd server && ./gram_cli -f ./cmd/cli/test.json
+        run: cd server && ./gram_cli -f ./cmd/cli/gram/test.json
