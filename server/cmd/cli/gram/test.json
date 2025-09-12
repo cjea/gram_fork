@@ -1,5 +1,5 @@
 {
-    "project": "cj",
+    "schema_version": "1.0.0",
     "sources": [
         {
             "type": "openapiv3",

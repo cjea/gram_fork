@@ -30,5 +30,7 @@ jobs:
           GRAM_API_KEY: ${{ secrets.GRAM_API_KEY }}
           GRAM_SCHEME: https
           GRAM_HOST: ${{ vars.GRAM_HOST }}
-          GRAM_PROJECT_SLUG: ${{ vars.GRAM_PROJECT_SLUG }}
-        run: cd server && ./gram_cli -f ./cmd/cli/gram/test.json
+          # GRAM_PROJECT_SLUG: ${{ vars.GRAM_PROJECT_SLUG }}
+        run: |
+          cd server
+          ./gram_cli --project cj --file cmd/cli/gram/test.json

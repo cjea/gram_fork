@@ -30,6 +30,13 @@ func NewCLI() CLI {
 				Usage:    "Path to the deployment configuration file",
 				Required: true,
 			},
+			&cli.StringFlag{
+				Name:    "project",
+				Aliases: []string{"p"},
+				Usage: fmt.Sprintf(
+					"Project slug (falls back to %s environment variable)",
+					env.EnvVarProjectSlug),
+			},
 		},
 		Action: mainAction,
 	}
@@ -53,11 +60,16 @@ func mainAction(c *cli.Context) error {
 		return fmt.Errorf("error reading project config: %w", err)
 	}
 
-	fmt.Printf("Loaded project: %s\n", deplconfig.Project)
-	fmt.Printf("Sources: %+v\n", deplconfig.Sources)
-
 	apiKey := env.ReadApiKey()
-	projectSlug := env.Must("GRAM_PROJECT_SLUG")
+
+	// Use project flag if provided, otherwise fallback to environment variable
+	projectSlug := c.String("project")
+	if projectSlug == "" {
+		projectSlug = env.ReadProjectSlug()
+	}
+
+	fmt.Printf("Project: %s\n", projectSlug)
+	fmt.Printf("Sources: %+v\n", deplconfig.Sources)
 
 	deplclient := api.NewDeploymentsClient()
 	result := deplclient.ListDeployments(apiKey, projectSlug)

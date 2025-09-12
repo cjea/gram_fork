@@ -22,8 +22,8 @@ type Source struct {
 }
 
 type DeploymentConfig struct {
-	// Project defines which project in which to create the deployment.
-	Project string `json:"project"`
+	// SchemaVersion defines the version of the configuration schema.
+	SchemaVersion string `json:"schema_version"`
 
 	// Sources defines the list of prospective assets to include in the
 	// deployment.
@@ -43,6 +43,11 @@ func ReadDeploymentConfig(filePath string) (*DeploymentConfig, error) {
 
 	if err := json.Unmarshal(data, &cfg); err != nil {
 		return nil, fmt.Errorf("failed to parse JSON: %w", err)
+	}
+
+	// Validate schema version
+	if cfg.SchemaVersion != "1.0.0" {
+		return nil, fmt.Errorf("unsupported schema version: %s, expected: 1.0.0", cfg.SchemaVersion)
 	}
 
 	cfg.GetProducerToken = env.ReadApiKey
