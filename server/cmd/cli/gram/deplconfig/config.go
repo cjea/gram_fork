@@ -30,7 +30,7 @@ type DeploymentConfig struct {
 	Sources []Source `json:"sources"`
 
 	// GetProducerToken returns an API key with a `producer` scope.
-	GetProducerToken func() string
+	GetProducerToken func() string `json:"-"`
 }
 
 func ReadDeploymentConfig(filePath string) (*DeploymentConfig, error) {
@@ -61,5 +61,9 @@ func readFile(filePath string) ([]byte, error) {
 		return nil, fmt.Errorf("path must be a regular file")
 	}
 
-	return os.ReadFile(filePath)
+	data, err := os.ReadFile(filePath) // #nosec G304
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file: %w", err)
+	}
+	return data, nil
 }

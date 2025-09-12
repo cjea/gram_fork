@@ -8,7 +8,7 @@ import (
 
 // EnvVarGramAPIKey is the environment variable name which points to the user's
 // API key.
-const EnvVarGramAPIKey = "GRAM_API_KEY"
+const EnvVarGramAPIKey = "GRAM_API_KEY" // #nosec G101
 
 func ReadApiKey() string {
 	return validateApiKey(Must(EnvVarGramAPIKey))

@@ -38,7 +38,10 @@ func NewCLI() CLI {
 }
 
 func (c *cliApp) Run(args []string) error {
-	return c.app.Run(args)
+	if err := c.app.Run(args); err != nil {
+		return fmt.Errorf("failed to run CLI app: %w", err)
+	}
+	return nil
 }
 
 func mainAction(c *cli.Context) error {

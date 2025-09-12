@@ -2,9 +2,12 @@ package api
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"log"
 
 	"github.com/speakeasy-api/gram/server/cmd/cli/env"
+	"github.com/speakeasy-api/gram/server/cmd/cli/gram/deplconfig"
 	"github.com/speakeasy-api/gram/server/gen/assets"
 	assets_client "github.com/speakeasy-api/gram/server/gen/http/assets/client"
 	goahttp "goa.design/goa/v3/http"
@@ -34,6 +37,60 @@ func (c *AssetsClient) ListAssets(apiKey, projectSlug string) *assets.ListAssets
 	}
 
 	return result
+}
+
+// AssetSource represents a source for creating an asset
+type AssetSource interface {
+	// GetType returns the type of the source (e.g., "openapiv3").
+	GetType() string
+	// GetContentType returns the MIME type of the content (e.g., "application/json", "application/yaml").
+	GetContentType() string
+	// Read returns a reader for the asset content and its size.
+	Read() (io.ReadCloser, int64, error)
+}
+
+func (c *AssetsClient) CreateAsset(source AssetSource) (*assets.UploadOpenAPIv3Result, error) {
+	ctx := context.Background()
+
+	// TODO(cj): This will support other types later.
+	if !isOpenAPIV3(source) {
+		return nil, fmt.Errorf(
+			"unsupported source type: '%s', expected '%s'",
+			source.GetType(), deplconfig.SourceTypeOpenAPIV3,
+		)
+	}
+
+	reader, contentLength, err := source.Read()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read source: %w", err)
+	}
+	defer func() {
+		if closeErr := reader.Close(); closeErr != nil {
+			log.Printf("Error closing reader: %v", closeErr)
+		}
+	}()
+
+	apiKey := env.ReadApiKey()
+	projectSlug := env.Must("GRAM_PROJECT_SLUG")
+
+	payload := &assets.UploadOpenAPIv3Form{
+		ApikeyToken:      &apiKey,
+		ProjectSlugInput: &projectSlug,
+		SessionToken:     nil,
+		ContentType:      source.GetContentType(),
+		ContentLength:    contentLength,
+	}
+
+	result, err := c.client.UploadOpenAPIv3(ctx, payload, reader)
+	if err != nil {
+		return nil, fmt.Errorf("failed to upload OpenAPI asset: %w", err)
+	}
+
+	return result, nil
+}
+
+func isOpenAPIV3(a AssetSource) bool {
+	return a.GetType() != string(deplconfig.SourceTypeOpenAPIV3)
 }
 
 func newAssetsClient() *assets.Client {
