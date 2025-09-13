@@ -58,9 +58,15 @@ func (c *DeploymentsClient) CreateDeployment(dc DeploymentCreator) (*deployments
 	payload := &deployments.CreateDeploymentPayload{
 		ApikeyToken:      &apiKey,
 		ProjectSlugInput: &projectSlug,
-		SessionToken:     nil,
 		IdempotencyKey:   dc.GetIdempotencyKey(),
 		Openapiv3Assets:  dc.GetOpenAPIv3Assets(),
+		SessionToken:     nil,
+		GithubRepo:       nil,
+		GithubPr:         nil,
+		GithubSha:        nil,
+		ExternalID:       nil,
+		ExternalURL:      nil,
+		Packages:         nil,
 	}
 
 	result, err := c.client.CreateDeployment(ctx, payload)

@@ -7,21 +7,21 @@ import (
 )
 
 const (
-	// EnvVarGramAPIKey is the environment variable name which points to the user's
+	// VarNameProducerKey is the environment variable name which points to the user's
 	// API key.
-	EnvVarGramAPIKey = "GRAM_API_KEY" // #nosec G101
+	VarNameProducerKey = "GRAM_API_KEY"
 
-	// EnvVarProjectSlug is the environment variable name which points to the user's
+	// VarNameProjectSlug is the environment variable name which points to the user's
 	// intended project.
-	EnvVarProjectSlug = "GRAM_PROJECT_SLUG" // #nosec G101
+	VarNameProjectSlug = "GRAM_PROJECT_SLUG"
 )
 
 func MustApiKey() string {
-	return validateApiKey(Must(EnvVarGramAPIKey))
+	return validateApiKey(Must(VarNameProducerKey))
 }
 
 func MustProjectSlug() string {
-	return Must(EnvVarProjectSlug)
+	return Must(VarNameProjectSlug)
 }
 
 const apiKeyPrefix = "gram"

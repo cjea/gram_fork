@@ -35,7 +35,7 @@ func NewCLI() CLI {
 				Aliases: []string{"p"},
 				Usage: fmt.Sprintf(
 					"Project slug (falls back to %s environment variable)",
-					env.EnvVarProjectSlug),
+					env.VarNameProjectSlug),
 			},
 		},
 		Action: mainAction,
