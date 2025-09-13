@@ -3,9 +3,9 @@ package app
 import (
 	"fmt"
 
-	"github.com/speakeasy-api/gram/server/cmd/cli/env"
 	"github.com/speakeasy-api/gram/server/cmd/cli/gram/api"
 	"github.com/speakeasy-api/gram/server/cmd/cli/gram/deplconfig"
+	"github.com/speakeasy-api/gram/server/cmd/cli/gram/env"
 	"github.com/speakeasy-api/gram/server/gen/assets"
 	"github.com/speakeasy-api/gram/server/gen/deployments"
 	"github.com/urfave/cli/v2"
@@ -60,12 +60,11 @@ func mainAction(c *cli.Context) error {
 		return fmt.Errorf("error reading project config: %w", err)
 	}
 
-	apiKey := env.ReadApiKey()
+	apiKey := env.MustApiKey()
 
-	// Use project flag if provided, otherwise fallback to environment variable
 	projectSlug := c.String("project")
 	if projectSlug == "" {
-		projectSlug = env.ReadProjectSlug()
+		projectSlug = env.MustProjectSlug()
 	}
 
 	fmt.Printf("Project: %s\n", projectSlug)

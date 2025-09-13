@@ -6,8 +6,8 @@ import (
 	"io"
 	"log"
 
-	"github.com/speakeasy-api/gram/server/cmd/cli/env"
 	"github.com/speakeasy-api/gram/server/cmd/cli/gram/deplconfig"
+	"github.com/speakeasy-api/gram/server/cmd/cli/gram/env"
 	"github.com/speakeasy-api/gram/server/gen/assets"
 	assets_client "github.com/speakeasy-api/gram/server/gen/http/assets/client"
 	goahttp "goa.design/goa/v3/http"
@@ -39,8 +39,8 @@ func (c *AssetsClient) ListAssets(apiKey, projectSlug string) *assets.ListAssets
 	return result
 }
 
-// AssetCreator represents a source for creating an asset
-type AssetCreator interface {
+// AssetSource represents a source for creating an asset
+type AssetSource interface {
 	CredentialGetter
 
 	// GetType returns the type of the source (e.g., "openapiv3").
@@ -51,7 +51,7 @@ type AssetCreator interface {
 	Read() (io.ReadCloser, int64, error)
 }
 
-func (c *AssetsClient) CreateAsset(ac AssetCreator) (*assets.UploadOpenAPIv3Result, error) {
+func (c *AssetsClient) CreateAsset(ac AssetSource) (*assets.UploadOpenAPIv3Result, error) {
 	ctx := context.Background()
 
 	// TODO(cj): This will support other types later.
@@ -91,7 +91,7 @@ func (c *AssetsClient) CreateAsset(ac AssetCreator) (*assets.UploadOpenAPIv3Resu
 	return result, nil
 }
 
-func isOpenAPIV3(a AssetCreator) bool {
+func isOpenAPIV3(a AssetSource) bool {
 	return a.GetType() != string(deplconfig.SourceTypeOpenAPIV3)
 }
 

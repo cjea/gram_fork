@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/speakeasy-api/gram/server/cmd/cli/env"
+	"github.com/speakeasy-api/gram/server/cmd/cli/gram/env"
 	"github.com/speakeasy-api/gram/server/gen/deployments"
 	depl_client "github.com/speakeasy-api/gram/server/gen/http/deployments/client"
 	goahttp "goa.design/goa/v3/http"

@@ -16,11 +16,11 @@ const (
 	EnvVarProjectSlug = "GRAM_PROJECT_SLUG" // #nosec G101
 )
 
-func ReadApiKey() string {
+func MustApiKey() string {
 	return validateApiKey(Must(EnvVarGramAPIKey))
 }
 
-func ReadProjectSlug() string {
+func MustProjectSlug() string {
 	return Must(EnvVarProjectSlug)
 }
 

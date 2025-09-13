@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/speakeasy-api/gram/server/cmd/cli/env"
+	"github.com/speakeasy-api/gram/server/cmd/cli/gram/env"
 )
 
 type SourceType string
@@ -50,7 +50,7 @@ func ReadDeploymentConfig(filePath string) (*DeploymentConfig, error) {
 		return nil, fmt.Errorf("unsupported schema version: %s, expected: 1.0.0", cfg.SchemaVersion)
 	}
 
-	cfg.GetProducerToken = env.ReadApiKey
+	cfg.GetProducerToken = env.MustApiKey
 
 	return &cfg, nil
 }
