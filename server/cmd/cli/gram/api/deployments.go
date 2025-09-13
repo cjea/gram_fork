@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/speakeasy-api/gram/server/cmd/cli/env"
@@ -35,6 +36,39 @@ func (c *DeploymentsClient) ListDeployments(apiKey, projectSlug string) *deploym
 	}
 
 	return result
+}
+
+// DeploymentCreator represents a request for creating a deployment
+type DeploymentCreator interface {
+	CredentialGetter
+
+	// GetIdempotencyKey returns a unique identifier that will mitigate against duplicate deployments.
+	GetIdempotencyKey() string
+
+	// GetOpenAPIv3Assets returns the OpenAPI v3 assets to include in the deployment.
+	GetOpenAPIv3Assets() []*deployments.AddOpenAPIv3DeploymentAssetForm
+}
+
+func (c *DeploymentsClient) CreateDeployment(dc DeploymentCreator) (*deployments.CreateDeploymentResult, error) {
+	ctx := context.Background()
+
+	apiKey := dc.GetApiKey()
+	projectSlug := dc.GetProjectSlug()
+
+	payload := &deployments.CreateDeploymentPayload{
+		ApikeyToken:      &apiKey,
+		ProjectSlugInput: &projectSlug,
+		SessionToken:     nil,
+		IdempotencyKey:   dc.GetIdempotencyKey(),
+		Openapiv3Assets:  dc.GetOpenAPIv3Assets(),
+	}
+
+	result, err := c.client.CreateDeployment(ctx, payload)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create deployment: %w", err)
+	}
+
+	return result, nil
 }
 
 func newDeploymentClient() *deployments.Client {

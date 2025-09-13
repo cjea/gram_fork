@@ -39,8 +39,10 @@ func (c *AssetsClient) ListAssets(apiKey, projectSlug string) *assets.ListAssets
 	return result
 }
 
-// AssetSource represents a source for creating an asset
-type AssetSource interface {
+// AssetCreator represents a source for creating an asset
+type AssetCreator interface {
+	CredentialGetter
+
 	// GetType returns the type of the source (e.g., "openapiv3").
 	GetType() string
 	// GetContentType returns the MIME type of the content (e.g., "application/json", "application/yaml").
@@ -49,18 +51,18 @@ type AssetSource interface {
 	Read() (io.ReadCloser, int64, error)
 }
 
-func (c *AssetsClient) CreateAsset(source AssetSource) (*assets.UploadOpenAPIv3Result, error) {
+func (c *AssetsClient) CreateAsset(ac AssetCreator) (*assets.UploadOpenAPIv3Result, error) {
 	ctx := context.Background()
 
 	// TODO(cj): This will support other types later.
-	if !isOpenAPIV3(source) {
+	if !isOpenAPIV3(ac) {
 		return nil, fmt.Errorf(
 			"unsupported source type: '%s', expected '%s'",
-			source.GetType(), deplconfig.SourceTypeOpenAPIV3,
+			ac.GetType(), deplconfig.SourceTypeOpenAPIV3,
 		)
 	}
 
-	reader, contentLength, err := source.Read()
+	reader, contentLength, err := ac.Read()
 	if err != nil {
 		return nil, fmt.Errorf("failed to read source: %w", err)
 	}
@@ -70,14 +72,14 @@ func (c *AssetsClient) CreateAsset(source AssetSource) (*assets.UploadOpenAPIv3R
 		}
 	}()
 
-	apiKey := env.ReadApiKey()
-	projectSlug := env.Must("GRAM_PROJECT_SLUG")
+	apiKey := ac.GetApiKey()
+	projectSlug := ac.GetProjectSlug()
 
 	payload := &assets.UploadOpenAPIv3Form{
 		ApikeyToken:      &apiKey,
 		ProjectSlugInput: &projectSlug,
 		SessionToken:     nil,
-		ContentType:      source.GetContentType(),
+		ContentType:      ac.GetContentType(),
 		ContentLength:    contentLength,
 	}
 
@@ -89,7 +91,7 @@ func (c *AssetsClient) CreateAsset(source AssetSource) (*assets.UploadOpenAPIv3R
 	return result, nil
 }
 
-func isOpenAPIV3(a AssetSource) bool {
+func isOpenAPIV3(a AssetCreator) bool {
 	return a.GetType() != string(deplconfig.SourceTypeOpenAPIV3)
 }
 
