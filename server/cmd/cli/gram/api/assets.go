@@ -23,7 +23,9 @@ func NewAssetsClient() *AssetsClient {
 	}
 }
 
-func (c *AssetsClient) ListAssets(apiKey, projectSlug string) *assets.ListAssetsResult {
+func (c *AssetsClient) ListAssets(
+	apiKey string, projectSlug string,
+) *assets.ListAssetsResult {
 	ctx := context.Background()
 	payload := &assets.ListAssetsPayload{
 		ApikeyToken:      &apiKey,
@@ -39,19 +41,27 @@ func (c *AssetsClient) ListAssets(apiKey, projectSlug string) *assets.ListAssets
 	return result
 }
 
-// AssetSource represents a source for creating an asset
-type AssetSource interface {
-	CredentialGetter
-
+// SourceReader defines the interface for reading source content.
+type SourceReader interface {
 	// GetType returns the type of the source (e.g., "openapiv3").
 	GetType() string
-	// GetContentType returns the MIME type of the content (e.g., "application/json", "application/yaml").
+	// GetContentType returns the MIME type of the content (e.g.,
+	// "application/json", "application/yaml").
 	GetContentType() string
 	// Read returns a reader for the asset content and its size.
 	Read() (io.ReadCloser, int64, error)
 }
 
-func (c *AssetsClient) CreateAsset(ac AssetSource) (*assets.UploadOpenAPIv3Result, error) {
+// AssetCreator represents a source for creating an asset, composed of
+// credential access and source reading.
+type AssetCreator interface {
+	CredentialGetter
+	SourceReader
+}
+
+func (c *AssetsClient) CreateAsset(
+	ac AssetCreator,
+) (*assets.UploadOpenAPIv3Result, error) {
 	ctx := context.Background()
 
 	// TODO(cj): This will support other types later.
@@ -91,8 +101,8 @@ func (c *AssetsClient) CreateAsset(ac AssetSource) (*assets.UploadOpenAPIv3Resul
 	return result, nil
 }
 
-func isOpenAPIV3(a AssetSource) bool {
-	return a.GetType() != string(deplconfig.SourceTypeOpenAPIV3)
+func isOpenAPIV3(a AssetCreator) bool {
+	return a.GetType() == string(deplconfig.SourceTypeOpenAPIV3)
 }
 
 func newAssetsClient() *assets.Client {

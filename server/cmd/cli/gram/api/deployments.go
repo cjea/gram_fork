@@ -21,7 +21,10 @@ func NewDeploymentsClient() *DeploymentsClient {
 	}
 }
 
-func (c *DeploymentsClient) ListDeployments(apiKey, projectSlug string) *deployments.ListDeploymentResult {
+func (c *DeploymentsClient) ListDeployments(
+	apiKey string,
+	projectSlug string,
+) *deployments.ListDeploymentResult {
 	ctx := context.Background()
 	payload := &deployments.ListDeploymentsPayload{
 		ApikeyToken:      &apiKey,
@@ -42,14 +45,18 @@ func (c *DeploymentsClient) ListDeployments(apiKey, projectSlug string) *deploym
 type DeploymentCreator interface {
 	CredentialGetter
 
-	// GetIdempotencyKey returns a unique identifier that will mitigate against duplicate deployments.
+	// GetIdempotencyKey returns a unique identifier that will mitigate against
+	// duplicate deployments.
 	GetIdempotencyKey() string
 
-	// GetOpenAPIv3Assets returns the OpenAPI v3 assets to include in the deployment.
+	// GetOpenAPIv3Assets returns the OpenAPI v3 assets to include in the
+	// deployment.
 	GetOpenAPIv3Assets() []*deployments.AddOpenAPIv3DeploymentAssetForm
 }
 
-func (c *DeploymentsClient) CreateDeployment(dc DeploymentCreator) (*deployments.CreateDeploymentResult, error) {
+func (c *DeploymentsClient) CreateDeployment(
+	dc DeploymentCreator,
+) (*deployments.CreateDeploymentResult, error) {
 	ctx := context.Background()
 
 	apiKey := dc.GetApiKey()
