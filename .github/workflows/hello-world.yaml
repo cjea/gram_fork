@@ -22,10 +22,10 @@ jobs:
       - name: "[Simulate] Install CLI"
         run: |
           cd server
-          go build -o gram_cli ./cmd/cli/gram/main.go
-          ls -lh gram_cli
+          go build -o gram ./cmd/cli/gram/main.go
+          ls -lh gram
 
-      - name: Run CLI
+      - name: Push Deploy
         env:
           GRAM_API_KEY: ${{ secrets.GRAM_API_KEY }}
           GRAM_SCHEME: https
@@ -33,4 +33,4 @@ jobs:
           # GRAM_PROJECT_SLUG: ${{ vars.GRAM_PROJECT_SLUG }}
         run: |
           cd server
-          ./gram_cli --project cj --file cmd/cli/gram/test.json
+          ./gram push --project cj --file ./cmd/cli/gram/test.json

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"slices"
 
 	"github.com/speakeasy-api/gram/server/cmd/cli/gram/env"
 )
@@ -28,11 +29,35 @@ type DeploymentConfig struct {
 	// Sources defines the list of prospective assets to include in the
 	// deployment.
 	Sources []Source `json:"sources"`
-
-	// GetProducerToken returns an API key with a `producer` scope.
-	GetProducerToken func() string `json:"-"`
 }
 
+// GetProducerToken returns an API key with a `producer` scope.
+func (dc DeploymentConfig) GetProducerToken() string {
+	return env.MustApiKey()
+}
+
+var ValidSchemaVersions = []string{"1.0.0"}
+
+// SchemaValid returns true if the incoming schema version is valid.
+func (dc DeploymentConfig) SchemaValid() bool {
+	return slices.Contains(ValidSchemaVersions, dc.SchemaVersion)
+}
+
+func (dc DeploymentConfig) Validate() error {
+	if !dc.SchemaValid() {
+		msg := "unsupported schema version: '%s'. Expected one of %+v"
+
+		return fmt.Errorf(msg, dc.SchemaVersion, ValidSchemaVersions)
+	}
+
+	if len(dc.Sources) < 1 {
+		return fmt.Errorf("must specify at least one source")
+	}
+
+	return nil
+}
+
+// ReadDeploymentConfig reads a deployment config.
 func ReadDeploymentConfig(filePath string) (*DeploymentConfig, error) {
 	var cfg DeploymentConfig
 
@@ -45,12 +70,9 @@ func ReadDeploymentConfig(filePath string) (*DeploymentConfig, error) {
 		return nil, fmt.Errorf("failed to parse JSON: %w", err)
 	}
 
-	// Validate schema version
-	if cfg.SchemaVersion != "1.0.0" {
-		return nil, fmt.Errorf("unsupported schema version: %s, expected: 1.0.0", cfg.SchemaVersion)
+	if err := cfg.Validate(); err != nil {
+		return nil, err
 	}
-
-	cfg.GetProducerToken = env.MustApiKey
 
 	return &cfg, nil
 }

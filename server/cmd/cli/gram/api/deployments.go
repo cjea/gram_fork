@@ -54,6 +54,7 @@ type DeploymentCreator interface {
 	GetOpenAPIv3Assets() []*deployments.AddOpenAPIv3DeploymentAssetForm
 }
 
+// CreateDeployment creates a remote deployment.
 func (c *DeploymentsClient) CreateDeployment(
 	dc DeploymentCreator,
 ) (*deployments.CreateDeploymentResult, error) {
