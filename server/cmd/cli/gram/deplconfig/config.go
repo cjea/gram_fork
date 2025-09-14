@@ -3,7 +3,9 @@ package deplconfig
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
+	"path/filepath"
 	"slices"
 
 	"github.com/speakeasy-api/gram/server/cmd/cli/gram/env"
@@ -43,6 +45,8 @@ func (dc DeploymentConfig) SchemaValid() bool {
 	return slices.Contains(ValidSchemaVersions, dc.SchemaVersion)
 }
 
+// Validate returns an error if the schema version is invalid, or if the config
+// is missing sources.
 func (dc DeploymentConfig) Validate() error {
 	if !dc.SchemaValid() {
 		msg := "unsupported schema version: '%s'. Expected one of %+v"
@@ -55,6 +59,27 @@ func (dc DeploymentConfig) Validate() error {
 	}
 
 	return nil
+}
+
+// ResolveLocations resolves relative source locations relative to the specified directory.
+// URLs and absolute paths are left unchanged.
+func (dc *DeploymentConfig) ResolveLocations(baseDir string) {
+	for i := range dc.Sources {
+		location := dc.Sources[i].Location
+		if isURL(location) || filepath.IsAbs(location) {
+			continue
+		}
+
+		dc.Sources[i].Location = filepath.Join(baseDir, location)
+	}
+}
+
+var urlSchemes = []string{"http", "https"}
+
+// isURL checks if the given string is a URL (http or https).
+func isURL(s string) bool {
+	u, err := url.Parse(s)
+	return err == nil && slices.Contains(urlSchemes, u.Scheme)
 }
 
 // ReadDeploymentConfig reads a deployment config.
@@ -73,6 +98,10 @@ func ReadDeploymentConfig(filePath string) (*DeploymentConfig, error) {
 	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}
+
+	// Resolve relative paths in sources relative to the config file's directory
+	configDir := filepath.Dir(filePath)
+	cfg.ResolveLocations(configDir)
 
 	return &cfg, nil
 }
