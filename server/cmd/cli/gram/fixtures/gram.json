@@ -4,8 +4,8 @@
     "sources": [
         {
             "type": "openapiv3",
-            "location": "./petstore.yaml",
-            "name": "CJ's Petstore",
+            "location": "https://petstore3.swagger.io/api/v3/openapi.json",
+            "name": "CJ's Petstore (remote)",
             "slug": "cjs-petstore"
         },
         {

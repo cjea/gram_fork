@@ -1,13 +1,25 @@
 package deplconfig
 
 import (
+	"bufio"
+	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"mime"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
+
+const (
+	// MaxRemoteFileSizeMB is the maximum size allowed for remote files (10MB)
+	MaxRemoteFileSizeMB = 10
+	MaxRemoteFileSize   = MaxRemoteFileSizeMB * 1024 * 1024
+)
+
 
 // SourceReader reads source content from local files or remote URLs.
 type SourceReader struct {
@@ -61,11 +73,58 @@ func (sr *SourceReader) readLocal() (io.ReadCloser, int64, error) {
 	return io.NopCloser(reader), fi.Size(), nil
 }
 
-// readRemote reads from a remote URL (placeholder for future implementation).
+// readRemote reads from a remote URL.
 func (sr *SourceReader) readRemote() (io.ReadCloser, int64, error) {
-	// TODO: Implement remote file reading (HTTP/HTTPS URLs)
-	// This could use http.Get() and handle redirects, authentication, etc.
-	return nil, 0, fmt.Errorf("remote URL reading not yet implemented: %s", sr.source.Location)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", sr.source.Location, nil)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("User-Agent", "gram-cli/1.0")
+	req.Header.Set("Accept", "application/yaml, application/json, text/yaml, text/plain, */*")
+
+	resp, err := sharedRetryHTTPClient.Do(req)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to fetch remote file: %w", err)
+	}
+	defer func() {
+		if resp.Body != nil {
+			_ = resp.Body.Close()
+		}
+	}()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, 0, fmt.Errorf("remote file request failed with status %d: %s", resp.StatusCode, resp.Status)
+	}
+
+	contentLength := resp.ContentLength
+	if contentLength > MaxRemoteFileSize {
+		return nil, 0, fmt.Errorf("remote file too large: %d bytes (max: %d bytes)", contentLength, MaxRemoteFileSize)
+	}
+
+	var buf bytes.Buffer
+	writer := bufio.NewWriterSize(&buf, 4096)
+
+	limitedReader := io.LimitReader(resp.Body, MaxRemoteFileSize+1) // +1 to detect if file exceeds limit
+	bytesRead, err := io.Copy(writer, limitedReader)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to read remote file content: %w", err)
+	}
+
+	if bytesRead > MaxRemoteFileSize {
+		return nil, 0, fmt.Errorf("remote file too large: exceeds %d bytes", MaxRemoteFileSize)
+	}
+
+	if err := writer.Flush(); err != nil {
+		return nil, 0, fmt.Errorf("failed to flush content: %w", err)
+	}
+
+	reader := strings.NewReader(buf.String())
+
+	return io.NopCloser(reader), bytesRead, nil
 }
 
 // isRemoteURL checks if the location is a remote URL.
