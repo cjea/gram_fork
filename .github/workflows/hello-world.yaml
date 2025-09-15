@@ -33,4 +33,4 @@ jobs:
           # GRAM_PROJECT_SLUG: ${{ vars.GRAM_PROJECT_SLUG }}
         run: |
           cd server
-          ./gram push --project cj --file ./cmd/cli/gram/test.json
+          ./gram push --project cj --file ./cmd/cli/gram/deployment.json
