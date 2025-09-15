@@ -8,6 +8,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+const Version = "0.1.0"
+
 type CLI interface {
 	Run(args []string) error
 }
@@ -17,18 +19,34 @@ type cliApp struct {
 }
 
 func NewCLI() CLI {
+	pushUsage := `Push a deployment to Gram.
+
+Sample deployment file
+======================
+{
+  "schema_version": "1.0.0",
+  "type": "deployment",
+  "sources": [
+    {
+      "type": "openapiv3",
+      "location": "/path/to/spec.yaml"
+    }
+  ]
+}`
+
 	app := &cli.App{
-		Name:  "gram_cli",
-		Usage: "Gram CLI tool",
+		Name:    "gram",
+		Usage:   "Remote MCP management",
+		Version: Version,
 		Commands: []*cli.Command{
 			{
 				Name:  "push",
-				Usage: "Deploy from a configuration file",
+				Usage: pushUsage,
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:     "file",
 						Aliases:  []string{"f"},
-						Usage:    "Path to the deployment configuration file",
+						Usage:    "Path to the deployment file (relative locations resolve to the deployment file's directory)",
 						Required: true,
 					},
 					&cli.StringFlag{
