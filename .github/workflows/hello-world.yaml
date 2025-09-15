@@ -21,13 +21,13 @@ jobs:
 
       - name: "[Simulate] Install CLI"
         run: |
-          cd server
-          go build -o gram ./cmd/cli/gram/main.go
+          cd server/cmd/cli/gram
+          go build -o gram ./main.go
           ls -lh gram
 
       - name: Push to Gram
         env:
           GRAM_API_KEY: ${{ secrets.GRAM_API_KEY }}
         run: |
-          cd server
-          ./gram push --project cj --file ./cmd/cli/gram/fixtures/gram.json
+          cd server/cmd/cli/gram
+          ./gram push --project cj --file ./fixtures/gram.json
