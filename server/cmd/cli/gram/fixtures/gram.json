@@ -4,15 +4,21 @@
     "sources": [
         {
             "type": "openapiv3",
-            "location": "./fixtures/petstore.yaml"
+            "location": "./petstore.yaml",
+            "name": "CJ's Petstore",
+            "slug": "cjs-petstore"
         },
         {
             "type": "openapiv3",
-            "location": "./fixtures/symphony.json"
+            "location": "./symphony.json",
+            "name": "Night at the Symphony",
+            "slug": "symphony"
         },
         {
             "type": "openapiv3",
-            "location": "../../../../gen/http/openapi.yaml"
+            "location": "../../../../gen/http/openapi3.yaml",
+            "name": "Gram Official API",
+            "slug": "gram-official"
         }
     ]
 }

@@ -6,7 +6,6 @@ import (
 	"io"
 	"log/slog"
 	"os"
-	"strings"
 
 	"github.com/google/uuid"
 	"github.com/speakeasy-api/gram/server/cmd/cli/gram/api"
@@ -154,13 +153,10 @@ func convertSourcesToAssets(
 			return nil, fmt.Errorf("failed to upload asset for source %s: %w", source.Location, err)
 		}
 
-		// TODO(cj): add required source.Name and source.Slug instead of
-		// generating.
-		slug := generateSlug(source.Location)
 		asset := &deployments.AddOpenAPIv3DeploymentAssetForm{
 			AssetID: uploadResult.Asset.ID,
-			Name:    slug,
-			Slug:    types.Slug(slug),
+			Name:    source.Name,
+			Slug:    types.Slug(source.Slug),
 		}
 
 		assets = append(assets, asset)
@@ -171,16 +167,4 @@ func convertSourcesToAssets(
 	}
 
 	return assets, nil
-}
-
-// TODO(cj): require slug in the config instead of generating it.
-func generateSlug(location string) string {
-	filename := location
-	if lastSlash := strings.LastIndex(location, "/"); lastSlash != -1 {
-		filename = location[lastSlash+1:]
-	}
-	if lastDot := strings.LastIndex(filename, "."); lastDot != -1 {
-		filename = filename[:lastDot]
-	}
-	return strings.ReplaceAll(strings.ToLower(filename), " ", "-")
 }
