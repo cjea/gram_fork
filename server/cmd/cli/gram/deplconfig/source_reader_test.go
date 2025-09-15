@@ -27,6 +27,8 @@ info:
 	source := Source{
 		Type:     SourceTypeOpenAPIV3,
 		Location: testFile,
+		Name:     "Test API",
+		Slug:     "test-api",
 	}
 
 	reader := NewSourceReader(source)
@@ -66,6 +68,8 @@ func TestSourceReader_JSONFile(t *testing.T) {
 	source := Source{
 		Type:     SourceTypeOpenAPIV3,
 		Location: testFile,
+		Name:     "Test JSON API",
+		Slug:     "test-json-api",
 	}
 
 	reader := NewSourceReader(source)
@@ -92,6 +96,8 @@ func TestSourceReader_NonexistentFile(t *testing.T) {
 	source := Source{
 		Type:     SourceTypeOpenAPIV3,
 		Location: "/nonexistent/path/file.yaml",
+		Name:     "Nonexistent API",
+		Slug:     "nonexistent-api",
 	}
 
 	reader := NewSourceReader(source)
@@ -107,6 +113,8 @@ func TestSourceReader_RemoteURL(t *testing.T) {
 	source := Source{
 		Type:     SourceTypeOpenAPIV3,
 		Location: "https://example.com/api-spec.yaml",
+		Name:     "Remote API",
+		Slug:     "remote-api",
 	}
 
 	reader := NewSourceReader(source)

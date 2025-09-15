@@ -22,6 +22,12 @@ type Source struct {
 
 	// Location is the filepath or remote URL of the asset source.
 	Location string `json:"location"`
+
+	// Name is the human readable name of the asset.
+	Name string `json:"name"`
+
+	// Slug is the human readable public id of the asset.
+	Slug string `json:"slug"`
 }
 
 type DeploymentConfig struct {
@@ -36,29 +42,6 @@ type DeploymentConfig struct {
 // GetProducerToken returns an API key with a `producer` scope.
 func (dc DeploymentConfig) GetProducerToken() string {
 	return env.MustApiKey()
-}
-
-var ValidSchemaVersions = []string{"1.0.0"}
-
-// SchemaValid returns true if the incoming schema version is valid.
-func (dc DeploymentConfig) SchemaValid() bool {
-	return slices.Contains(ValidSchemaVersions, dc.SchemaVersion)
-}
-
-// Validate returns an error if the schema version is invalid, or if the config
-// is missing sources.
-func (dc DeploymentConfig) Validate() error {
-	if !dc.SchemaValid() {
-		msg := "unsupported schema version: '%s'. Expected one of %+v"
-
-		return fmt.Errorf(msg, dc.SchemaVersion, ValidSchemaVersions)
-	}
-
-	if len(dc.Sources) < 1 {
-		return fmt.Errorf("must specify at least one source")
-	}
-
-	return nil
 }
 
 // ResolveLocations resolves relative source locations relative to the specified directory.

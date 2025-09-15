@@ -29,10 +29,15 @@ Sample deployment file
   "sources": [
     {
       "type": "openapiv3",
-      "location": "/path/to/spec.yaml"
+      "location": "/path/to/spec.yaml",
+      "name": "My API",
+      "slug": "my-api"
     }
   ]
-}`
+}
+
+NOTE: Names and slugs must be unique across all sources.
+`
 
 	app := &cli.App{
 		Name:    "gram",
