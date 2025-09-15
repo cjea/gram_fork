@@ -154,10 +154,13 @@ func convertSourcesToAssets(
 			return nil, fmt.Errorf("failed to upload asset for source %s: %w", source.Location, err)
 		}
 
+		// TODO(cj): add required source.Name and source.Slug instead of
+		// generating.
+		slug := generateSlug(source.Location)
 		asset := &deployments.AddOpenAPIv3DeploymentAssetForm{
 			AssetID: uploadResult.Asset.ID,
-			Name:    source.Location,
-			Slug:    types.Slug(generateSlug(source.Location)),
+			Name:    slug,
+			Slug:    types.Slug(slug),
 		}
 
 		assets = append(assets, asset)

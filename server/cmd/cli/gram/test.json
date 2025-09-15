@@ -3,7 +3,11 @@
     "sources": [
         {
             "type": "openapiv3",
-            "location": "./petstore.yaml"
+            "location": "./fixtures/petstore.yaml"
+        },
+        {
+            "type": "openapiv3",
+            "location": "./fixtures/symphony.json"
         }
     ]
 }

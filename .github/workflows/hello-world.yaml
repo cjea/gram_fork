@@ -25,7 +25,7 @@ jobs:
           go build -o gram ./cmd/cli/gram/main.go
           ls -lh gram
 
-      - name: Push Deploy
+      - name: Push to Gram
         env:
           GRAM_API_KEY: ${{ secrets.GRAM_API_KEY }}
           GRAM_SCHEME: https

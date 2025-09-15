@@ -1,0 +1,58 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Conductor API",
+        "description": "An API for orchestrating symphonies.",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/start-symphony": {
+            "post": {
+                "summary": "Start Symphony",
+                "description": "Begins the orchestration of a symphony.",
+                "responses": {
+                    "200": {
+                        "description": "Symphony successfully started",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The symphony has begun!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/perform-finale": {
+            "post": {
+                "summary": "Perform Finale",
+                "description": "Concludes the performance with a grand finale.",
+                "responses": {
+                    "200": {
+                        "description": "Finale successfully performed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The finale has been performed with grandeur!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
