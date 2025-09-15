@@ -5,6 +5,23 @@
         "description": "An API for orchestrating symphonies.",
         "version": "1.0.0"
     },
+    "servers": [
+        {
+            "url": "https://{environment}.symphony.ai",
+            "description": "Conduct a symphony for the environment",
+            "variables": {
+                "environment": {
+                    "description": "The environment name. Defaults to the production environment.",
+                    "default": "prod",
+                    "enum": [
+                        "prod",
+                        "staging",
+                        "dev"
+                    ]
+                }
+            }
+        }
+    ],
     "paths": {
         "/start-symphony": {
             "post": {
