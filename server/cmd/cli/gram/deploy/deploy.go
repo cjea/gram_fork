@@ -27,7 +27,7 @@ type DeploymentRequest struct {
 }
 
 func (dr *DeploymentRequest) GetApiKey() string {
-	return env.MustApiKey()
+	return env.APIKey()
 }
 
 func (dr *DeploymentRequest) GetProjectSlug() string {
@@ -100,7 +100,7 @@ type createAssetRequest struct {
 }
 
 func (sac *createAssetRequest) GetApiKey() string {
-	return env.MustApiKey()
+	return env.APIKey()
 }
 
 func (sac *createAssetRequest) GetProjectSlug() string {

@@ -116,8 +116,8 @@ func newDeploymentClient() *deployments.Client {
 func deploymentService() *depl_client.Client {
 	doer := goaSharedHTTPClient
 
-	scheme := env.Fallback("GRAM_SCHEME", "https")
-	host := env.Must("GRAM_HOST")
+	scheme := env.APIScheme()
+	host := env.APIHost()
 	enc := goahttp.RequestEncoder
 	dec := goahttp.ResponseDecoder
 	restoreBody := true // Enable body restoration to allow reading raw response on decode errors

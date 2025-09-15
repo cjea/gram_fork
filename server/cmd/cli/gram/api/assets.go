@@ -120,8 +120,8 @@ func newAssetsClient() *assets.Client {
 func assetsService() *assets_client.Client {
 	doer := goaSharedHTTPClient
 
-	scheme := env.Fallback("GRAM_SCHEME", "https")
-	host := env.Must("GRAM_HOST")
+	scheme := env.APIScheme()
+	host := env.APIHost()
 	enc := goahttp.RequestEncoder
 	dec := goahttp.ResponseDecoder
 	restoreBody := false

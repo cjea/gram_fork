@@ -7,21 +7,39 @@ import (
 )
 
 const (
-	// VarNameProducerKey is the environment variable name which points to the user's
-	// API key.
+	// VarNameProducerKey is the environment variable name which points to the
+	// user's API key.
 	VarNameProducerKey = "GRAM_API_KEY"
 
-	// VarNameProjectSlug is the environment variable name which points to the user's
-	// intended project.
+	// VarNameProjectSlug is the environment variable name which points to the
+	// user's intended project.
 	VarNameProjectSlug = "GRAM_PROJECT_SLUG"
+
+	// VarNameAPIScheme is the environment variable name which points to the API
+	// URL scheme, e.g. "https"
+	VarNameAPIScheme = "GRAM_SCHEME"
+
+	// VarNameAPIHost is the environment variable name which points to the API
+	// hostname, e.g. "example.com"
+	VarNameAPIHost = "GRAM_HOST"
 )
 
-func MustApiKey() string {
+func APIKey() string {
 	return validateApiKey(Must(VarNameProducerKey))
 }
 
-func MustProjectSlug() string {
+func ProjectSlug() string {
 	return Must(VarNameProjectSlug)
+}
+
+const defaultHostGramAPI = "app.getgram.ai"
+
+func APIHost() string {
+	return Fallback(VarNameAPIHost, defaultHostGramAPI)
+}
+
+func APIScheme() string {
+	return Fallback(VarNameAPIScheme, "https")
 }
 
 const apiKeyPrefix = "gram"

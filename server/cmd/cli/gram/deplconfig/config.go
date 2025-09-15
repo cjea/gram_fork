@@ -41,7 +41,7 @@ type DeploymentConfig struct {
 
 // GetProducerToken returns an API key with a `producer` scope.
 func (dc DeploymentConfig) GetProducerToken() string {
-	return env.MustApiKey()
+	return env.APIKey()
 }
 
 // ResolveLocations resolves relative source locations relative to the specified directory.
