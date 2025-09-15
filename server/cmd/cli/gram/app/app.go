@@ -5,11 +5,8 @@ import (
 
 	"github.com/speakeasy-api/gram/server/cmd/cli/gram/deploy"
 	"github.com/speakeasy-api/gram/server/cmd/cli/gram/env"
+	"github.com/speakeasy-api/gram/server/cmd/cli/gram/version"
 	"github.com/urfave/cli/v2"
-)
-
-const (
-	Version = "0.1.0"
 )
 
 var (
@@ -46,7 +43,7 @@ func NewCLI() CLI {
 	app := &cli.App{
 		Name:    "gram",
 		Usage:   "Remote MCP management",
-		Version: Version,
+		Version: version.Version,
 		Commands: []*cli.Command{
 			{
 				Name:        "push",
