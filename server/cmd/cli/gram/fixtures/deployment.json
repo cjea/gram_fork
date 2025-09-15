@@ -9,6 +9,10 @@
         {
             "type": "openapiv3",
             "location": "./fixtures/symphony.json"
+        },
+        {
+            "type": "openapiv3",
+            "location": "../../../../gen/http/openapi.yaml"
         }
     ]
 }
