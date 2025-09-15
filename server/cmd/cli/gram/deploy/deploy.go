@@ -150,7 +150,10 @@ func convertSourcesToAssets(
 
 		uploadResult, err := assetsClient.CreateAsset(assetCreator)
 		if err != nil {
-			return nil, fmt.Errorf("failed to upload asset for source %s: %w", source.Location, err)
+			return nil, fmt.Errorf(
+				"failed to upload asset in project '%s' for source %s: %w",
+				project, source.Location, err,
+			)
 		}
 
 		asset := &deployments.AddOpenAPIv3DeploymentAssetForm{

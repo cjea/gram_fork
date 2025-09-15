@@ -34,6 +34,9 @@ type DeploymentConfig struct {
 	// SchemaVersion defines the version of the configuration schema.
 	SchemaVersion string `json:"schema_version"`
 
+	// Type must always be set to "deployment". See `ConfigTypeDeployment`.
+	Type string `json:"type"`
+
 	// Sources defines the list of prospective assets to include in the
 	// deployment.
 	Sources []Source `json:"sources"`

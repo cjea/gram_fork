@@ -28,6 +28,10 @@ func APIKey() string {
 	return validateApiKey(Must(VarNameProducerKey))
 }
 
+func APIKeyMissing() bool {
+	return Missing(VarNameProducerKey)
+}
+
 func ProjectSlug() string {
 	return Must(VarNameProjectSlug)
 }
@@ -70,4 +74,8 @@ func Fallback(key string, fallback string) string {
 	} else {
 		return val
 	}
+}
+
+func Missing(key string) bool {
+	return len(os.Getenv(key)) == 0
 }

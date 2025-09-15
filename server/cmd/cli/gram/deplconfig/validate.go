@@ -12,8 +12,23 @@ func (dc DeploymentConfig) SchemaValid() bool {
 	return slices.Contains(ValidSchemaVersions, dc.SchemaVersion)
 }
 
+const ConfigTypeDeployment = "deployment"
+
+// SupportedType returns true if the source type is supported.
+func (s Source) SupportedType() bool {
+	return s.Type == SourceTypeOpenAPIV3
+}
+
+// TypeValid returns true if the incoming schema version is valid.
+func (dc DeploymentConfig) TypeValid() bool {
+	return dc.Type == ConfigTypeDeployment
+}
+
 // MissingRequiredFields returns an error if the source is missing required fields.
 func (s Source) MissingRequiredFields() error {
+	if s.Location == "" {
+		return fmt.Errorf("source is missing required field 'Location'")
+	}
 	if s.Name == "" {
 		return fmt.Errorf("source is missing required field 'name'")
 	}
@@ -62,9 +77,13 @@ func ValidateUniqueSlugs(sources []Source) error {
 // is missing sources, if sources have missing required fields, or if names/slugs are not unique.
 func (dc DeploymentConfig) Validate() error {
 	if !dc.SchemaValid() {
-		msg := "unsupported schema version: '%s'. Expected one of %+v"
-
+		msg := "unexpected value for 'schema_version': '%s'. Expected one of %+v"
 		return fmt.Errorf(msg, dc.SchemaVersion, ValidSchemaVersions)
+	}
+
+	if !dc.TypeValid() {
+		msg := "unexpected value for 'type': '%s'. Expected '%s'"
+		return fmt.Errorf(msg, dc.Type, ConfigTypeDeployment)
 	}
 
 	if len(dc.Sources) < 1 {
@@ -72,6 +91,9 @@ func (dc DeploymentConfig) Validate() error {
 	}
 
 	for i, source := range dc.Sources {
+		if !source.SupportedType() {
+			return fmt.Errorf("source at index %d has unsupported type '%s'. Only '%s' is supported", i, source.Type, SourceTypeOpenAPIV3)
+		}
 		if err := source.MissingRequiredFields(); err != nil {
 			return fmt.Errorf("source at index %d: %w", i, err)
 		}
