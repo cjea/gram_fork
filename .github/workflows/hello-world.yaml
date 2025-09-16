@@ -20,9 +20,11 @@ jobs:
           go-version: "1.23"
 
       - name: "Install and Push"
+        env:
+          GRAM_API_KEY: ${{ secrets.GRAM_API_KEY }}
         run: |
-          go install github.com/cjea/gram_fork/server/cmd/cli/gram@v0.1.0
-          gram push --project cj --file ./fixtures/gram.json
+          go install github.com/cjea/gram_fork/server/cmd/cli/gram@latest
+          gram push --project cj --file ./server/cmd/cli/gram/fixtures/gram.json
       # - name: "[Simulate] Install CLI"
       #   run: |
       #     cd server/cmd/cli/gram
