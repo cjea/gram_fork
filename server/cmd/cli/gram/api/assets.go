@@ -6,8 +6,11 @@ import (
 	"io"
 	"log"
 
-	"github.com/speakeasy-api/gram/server/cmd/cli/gram/deplconfig"
-	"github.com/speakeasy-api/gram/server/cmd/cli/gram/env"
+	// "github.com/speakeasy-api/gram/server/cmd/cli/gram/deplconfig"
+	// "github.com/speakeasy-api/gram/server/cmd/cli/gram/env"
+	"github.com/cjea/gram_fork/server/cmd/cli/gram/deplconfig"
+	"github.com/cjea/gram_fork/server/cmd/cli/gram/env"
+
 	"github.com/speakeasy-api/gram/server/gen/assets"
 	assets_client "github.com/speakeasy-api/gram/server/gen/http/assets/client"
 	goahttp "goa.design/goa/v3/http"

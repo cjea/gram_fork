@@ -4,7 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/speakeasy-api/gram/server/cmd/cli/gram/app"
+	// "github.com/speakeasy-api/gram/server/cmd/cli/gram/app"
+	"github.com/cjea/gram_fork/server/cmd/cli/gram/app"
 )
 
 func main() {

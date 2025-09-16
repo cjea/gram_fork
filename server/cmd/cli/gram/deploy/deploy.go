@@ -7,10 +7,10 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/cjea/gram_fork/server/cmd/cli/gram/api"
+	"github.com/cjea/gram_fork/server/cmd/cli/gram/deplconfig"
+	"github.com/cjea/gram_fork/server/cmd/cli/gram/env"
 	"github.com/google/uuid"
-	"github.com/speakeasy-api/gram/server/cmd/cli/gram/api"
-	"github.com/speakeasy-api/gram/server/cmd/cli/gram/deplconfig"
-	"github.com/speakeasy-api/gram/server/cmd/cli/gram/env"
 	"github.com/speakeasy-api/gram/server/gen/deployments"
 	"github.com/speakeasy-api/gram/server/gen/types"
 )
