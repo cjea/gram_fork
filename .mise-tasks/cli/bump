@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#MISE description="Update go.mod and set the version"
+#MISE depends=["cli:tidy","cli:version"]

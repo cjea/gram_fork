@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+#MISE dir="{{ config_root }}/server"
+#MISE description="Update the Gram server dependency."
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+CLI_DIR="${REPO_ROOT}/server/cmd/cli/gram"
+SERVER_MODULE=github.com/speakeasy-api/gram/server
+
+module_latest_version() {
+  local module="$1";
+  go list -m -versions -json "${module}@latest" | jq -r .Version
+}
+
+load_server_version() {
+  local v;
+  v=$(module_latest_version "$SERVER_MODULE")
+
+  if [[ -z "$v" ]]; then
+    echo "Error: Could not find latest version of $SERVER_MODULE"
+    exit 1
+  fi
+
+  echo "$v"
+}
+
+go_mod_tidy() (
+  local dep;
+  dep="${SERVER_MODULE}@$(load_server_version)"
+
+  cd "$CLI_DIR"
+  go mod edit -require="$dep"
+  go mod tidy
+
+  echo "Updated upstream dependency: $dep"
+)
+
+main() {
+  echo "Updating CLI go.mod dependency."
+  go_mod_tidy
+
+  echo "Updated $CLI_DIR/go.mod"
+}
+
+main "$@"

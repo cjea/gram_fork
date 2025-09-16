@@ -1,0 +1,40 @@
+name: CLI Test
+
+on:
+  pull_request:
+    branches:
+      - main
+      - cli
+
+jobs:
+  hello:
+    name: Iterate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: "Install and Push"
+        env:
+          GRAM_API_KEY: ${{ secrets.GRAM_API_KEY }}
+        run: |
+          go install github.com/cjea/gram_fork/server/cmd/cli/gram@latest
+          gram push --project cj --file ./server/cmd/cli/gram/fixtures/gram.json
+
+      # - name: "[Simulate] Install CLI"
+      #   run: |
+      #     cd server/cmd/cli/gram
+      #     go build -o gram ./main.go
+      #     ls -lh gram
+
+      # - name: Push to Gram
+      #   env:
+      #     GRAM_API_KEY: ${{ secrets.GRAM_API_KEY }}
+      #   run: |
+      #     cd server/cmd/cli/gram
+      #     ./gram push --project cj --file ./fixtures/gram.json
