@@ -25,6 +25,7 @@ jobs:
         run: |
           go install github.com/cjea/gram_fork/server/cmd/cli/gram@latest
           gram push --project cj --file ./server/cmd/cli/gram/fixtures/gram.json
+
       # - name: "[Simulate] Install CLI"
       #   run: |
       #     cd server/cmd/cli/gram

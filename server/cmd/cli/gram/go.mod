@@ -23,6 +23,3 @@ require (
 	golang.org/x/net v0.44.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-// replace github.com/speakeasy-api/gram/server/cmd/cli/gram => ../../../
-// replace github.com/cjea/gram_fork/server/cmd/cli/gram => ../../../

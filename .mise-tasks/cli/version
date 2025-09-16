@@ -4,10 +4,10 @@ set -euo pipefail
 
 #MISE dir="{{ config_root }}/server"
 #MISE description="Tag the gram CLI with an updated version."
-#MISE sources=["server/cmd/cli/gram/version/*.go"]
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
-VERSION_FILE="$REPO_ROOT/server/cmd/cli/gram/version/version.go"
+CLI_ROOT="${REPO_ROOT}/server/cmd/cli/gram"
+VERSION_FILE="${CLI_ROOT}/version/version.go"
 
 VERSION=
 
@@ -29,10 +29,19 @@ verify_version() {
   ask_version_correct
 }
 
+ensure_no_dirty() {
+  if ! git diff-index --quiet HEAD -- "$CLI_ROOT"; then
+    echo "Error: Git working directory is dirty. Please commit or stash your changes first."
+    echo "Only committed changes will be included in this tag."
+    exit 1
+  fi
+}
+
 ask_version_correct() {
-  echo "Current version: $VERSION ($VERSION_FILE)"
-  echo
-  read -p "Is this the correct version to tag? Have you bumped it if needed? (y/N): " -r
+  ensure_no_dirty
+
+  printf '\nCurrent version: %s (%s)\n' "$VERSION" "$VERSION_FILE"
+  read -p "Is $VERSION the correct version to tag? Have you bumped it if needed? (y/N): " -r
   echo
 
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
