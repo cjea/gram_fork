@@ -3,9 +3,12 @@ package app
 import (
 	"fmt"
 
-	"github.com/speakeasy-api/gram/server/cmd/cli/gram/deploy"
-	"github.com/speakeasy-api/gram/server/cmd/cli/gram/env"
-	"github.com/speakeasy-api/gram/server/cmd/cli/gram/version"
+	// "github.com/speakeasy-api/gram/server/cmd/cli/gram/deploy"
+	// "github.com/speakeasy-api/gram/server/cmd/cli/gram/env"
+	// "github.com/speakeasy-api/gram/server/cmd/cli/gram/version"
+	"github.com/cjea/gram_fork/server/cmd/cli/gram/deploy"
+	"github.com/cjea/gram_fork/server/cmd/cli/gram/env"
+	"github.com/cjea/gram_fork/server/cmd/cli/gram/version"
 	"github.com/urfave/cli/v2"
 )
 

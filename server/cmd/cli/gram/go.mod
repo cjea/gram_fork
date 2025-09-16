@@ -1,11 +1,11 @@
-module github.com/speakeasy-api/gram/server/cmd/cli/gram
+module github.com/cjea/gram_fork/server/cmd/cli/gram
 
 go 1.25.0
 
 require (
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-retryablehttp v0.7.8
-	github.com/speakeasy-api/gram/server v0.0.0-00010101000000-000000000000
+	github.com/speakeasy-api/gram/server v0.0.0-20250915224933-8e5a6705e482
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v2 v2.27.7
 	goa.design/goa/v3 v3.22.2
@@ -24,4 +24,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/speakeasy-api/gram/server => ../../../
+// replace github.com/speakeasy-api/gram/server/cmd/cli/gram => ../../../
+// replace github.com/cjea/gram_fork/server/cmd/cli/gram => ../../../
